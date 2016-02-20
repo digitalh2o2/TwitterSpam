@@ -43,6 +43,22 @@ class MicroBlogger
 		end		
 	end
 
+	def everyones_last_tweet
+		friends = []
+		@client.followers.each do |follower|
+			friends << @client.user(follower)
+		end
+		friends.sort_by! { |friend| friend.screen_name.downcase }
+		friends.each do |friend|
+			timestamp = friend.status.created_at
+			last_message = friend.status.text
+
+			puts "#{friend.screen_name} at #{timestamp.strftime("%A, %b, %d")} said..."
+			puts last_message
+			puts ""
+		end
+	end
+
 	def run
 		puts "Weclome to the JSL Twitter Client!"
 		command = ""
@@ -57,6 +73,7 @@ class MicroBlogger
 			when "t" then tweet(parts[1..-1].join(" "))
 			when "dm" then dm(parts[1], parts[2..-1].join(" "))
 			when "spam" then spam_my_followers(parts[1..-1].join(" "))
+			when "flt" then everyones_last_tweet
 			else
 				puts "Sorry, I don't know how to #{command}"
 			end
